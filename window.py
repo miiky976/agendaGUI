@@ -3,21 +3,25 @@ from phones import *
 
 
 class CreateWindow:
-    def which_selected(self):
-        print(f"At {select.curselection()}")
-        return int(select.curselection()[0])
+    def __init__(self):
+        self.db = Database()
+        self.pos = None
+
+    def which_selected(self, evt):
+        w = evt.widget
+        self.pos = int(w.curselection()[0])
+        self.load_entry()
 
     def add_entry(self):
-        phonelist.append([fnamevar.get(), lnamevar.get(), phonevar.get()])
+        self.db.insert(select.size(), fnamevar.get(), lnamevar.get(), phonevar.get())
         self.set_select()
 
     def update_entry(self):
-        phonelist[self.which_selected()] = [fnamevar.get(),
-                                            lnamevar.get(),
-                                            phonevar.get()]
+        self.db.update(self.pos, fnamevar.get(), lnamevar.get(), phonevar.get())
+        self.set_select()
 
     def delete_entry(self):
-        del phonelist[self.which_selected()]
+        self.db.delete(self.pos)
         self.set_select()
 
     def clear_entry(self):
@@ -26,13 +30,11 @@ class CreateWindow:
         phonevar.set("")
         self.set_select()
 
-    def load_entry(self, evt):
-        w = evt.widget
-        index = int(w.curselection()[0])
-        fname, lname, phone = phonelist[index]
-        fnamevar.set(fname)
-        lnamevar.set(lname)
-        phonevar.set(phone)
+    def load_entry(self):
+        records = self.db.get_id(self.pos)
+        fnamevar.set(records[1])
+        lnamevar.set(records[2])
+        phonevar.set(records[3])
 
     def make_window(self):
         global fnamevar, lnamevar, phonevar, select
@@ -72,7 +74,7 @@ class CreateWindow:
         frame3.pack()
         scroll = Scrollbar(frame3, orient=VERTICAL)
         select = Listbox(frame3, yscrollcommand=scroll.set, height=6)
-        select.bind('<<ListboxSelect>>', self.load_entry)
+        select.bind('<<ListboxSelect>>', self.which_selected)
         scroll.config(command=select.yview)
         scroll.pack(side=RIGHT, fill=Y)
         select.pack(side=LEFT, fill=BOTH, expand=1)
@@ -83,7 +85,7 @@ class CreateWindow:
         return win
 
     def set_select(self):
-        phonelist.sort(key=lambda record: record[1])
+        records = self.db.get_all()
         select.delete(0, END)
-        for fname, lname, phone in phonelist:
+        for id, fname, lname, phone in records:
             select.insert(END, f'{lname}, {fname}')

@@ -1,8 +1,97 @@
-phonelist = [['Chris', 'Meyers', '241-343-4349'],
-             ['Robert', 'Smith', '202-689-1234'],
-             ['Janet', 'Jones', '609-483-5432'],
-             ['Ralph', 'Barnhart', '215-683-2341'],
-             ['Eric', 'Nelson', '571-485-2689'],
-             ['Ford', 'Prefect', '703-987-6543'],
-             ['Mary', 'Zigler', '812-567-8901'],
-             ['Bob', 'Smith', '856-689-1234']]
+import sqlite3
+
+
+class Database:
+    def __init__(self):
+        try:
+            self.phone_data = ""
+            self.connection = sqlite3.connect("phonebook.db")
+            self.cursor = self.connection.cursor()
+            self.create_table()
+        except Exception as e:
+            print(e)
+        else:
+            print("Opened database successfully")
+        finally:
+            print("Finished Connecting to Database")
+
+    def drop_table(self, table):
+        sql_command = f"""DROP TABLE {table}"""
+        self.cursor.execute(sql_command)
+
+    def create_table(self):
+        sql_command = """
+        CREATE TABLE IF NOT EXISTS phonebook (
+        id int PRIMARY KEY,
+        fname VARCHAR(50),
+        lname VARCHAR(50),
+        number VARCHAR(20)
+        );
+        """
+        self.cursor.execute(sql_command)
+
+    def insert(self, id, fname, lname, phone):
+        try:
+            self.phone_data = [(id, fname, lname, phone)]
+            for i in self.phone_data:
+                sql_command = f"""
+                             INSERT INTO phonebook (id,
+                                                    fname,
+                                                    lname,
+                                                    number)
+                             VALUES ("{id}",
+                                     "{fname}",
+                                     "{lname}",
+                                     "{phone}");
+                             """
+                self.cursor.execute(sql_command)
+            self.connection.commit()
+        except Exception as err:
+            self.connection.rollback()
+            print("Could not add to database")
+            print(err)
+
+    def update(self, id, fname, lname, phone):
+        result = self.get_id(id)
+        if result:
+            try:
+                sql_command = """UPDATE phonebook SET fname = ?, lname = ?, number = ?\
+                                WHERE id = ?"""
+                self.cursor.execute(sql_command, (fname, lname, phone, id))
+                self.connection.commit()
+            except Exception as err:
+                self.connection.rollback()
+                print("Could not update table")
+                print(err)
+
+    def delete(self, id):
+        print(id)
+        try:
+            sql_command = """DELETE FROM phonebook WHERE id = ?"""
+            self.cursor.execute(sql_command, (id,))
+            self.connection.commit()
+        except Exception as err:
+            self.connection.rollback()
+            print("Could not delete from table")
+            print(err)
+
+    def get_all(self):
+        try:
+            sql_command = 'SELECT * FROM phonebook'
+            self.cursor.execute(sql_command)
+            result = self.cursor.fetchall()
+            return result
+        except Exception as err:
+            print(err)
+
+    def get_id(self, value):
+        try:
+            sql_command = f'SELECT * FROM phonebook WHERE id={value}'
+            self.cursor.execute(sql_command)
+            result = self.cursor.fetchall()
+            return result[0]
+        except Exception as err:
+            print(err)
+
+    def close(self):
+        self.connection.close()
