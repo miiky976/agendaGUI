@@ -30,16 +30,16 @@ class Database:
         """
         self.cursor.execute(sql_command)
 
-    def insert(self, id, fname, lname, phone):
+    def insert(self, identity, fname, lname, phone):
         try:
-            self.phone_data = [(id, fname, lname, phone)]
+            self.phone_data = [(identity, fname, lname, phone)]
             for i in self.phone_data:
                 sql_command = f"""
                              INSERT INTO phonebook (id,
                                                     fname,
                                                     lname,
                                                     number)
-                             VALUES ("{id}",
+                             VALUES ("{identity}",
                                      "{fname}",
                                      "{lname}",
                                      "{phone}");
@@ -51,24 +51,23 @@ class Database:
             print("Could not add to database")
             print(err)
 
-    def update(self, id, fname, lname, phone):
-        result = self.get_id(id)
+    def update(self, identity, fname, lname, phone):
+        result = self.get_id(identity)
         if result:
             try:
                 sql_command = """UPDATE phonebook SET fname = ?, lname = ?, number = ?\
                                 WHERE id = ?"""
-                self.cursor.execute(sql_command, (fname, lname, phone, id))
+                self.cursor.execute(sql_command, (fname, lname, phone, identity))
                 self.connection.commit()
             except Exception as err:
                 self.connection.rollback()
                 print("Could not update table")
                 print(err)
 
-    def delete(self, id):
-        print(id)
+    def delete(self, identity):
         try:
             sql_command = """DELETE FROM phonebook WHERE id = ?"""
-            self.cursor.execute(sql_command, (id,))
+            self.cursor.execute(sql_command, (identity,))
             self.connection.commit()
         except Exception as err:
             self.connection.rollback()

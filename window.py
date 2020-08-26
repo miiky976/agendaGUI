@@ -18,11 +18,11 @@ class CreateWindow:
 
     def update_entry(self):
         self.db.update(self.pos, fnamevar.get(), lnamevar.get(), phonevar.get())
-        self.set_select()
+        self.clear_entry()
 
     def delete_entry(self):
         self.db.delete(self.pos)
-        self.set_select()
+        self.clear_entry()
 
     def clear_entry(self):
         fnamevar.set("")
@@ -87,5 +87,5 @@ class CreateWindow:
     def set_select(self):
         records = self.db.get_all()
         select.delete(0, END)
-        for id, fname, lname, phone in records:
+        for identity, fname, lname, phone in records:
             select.insert(END, f'{lname}, {fname}')
