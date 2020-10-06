@@ -1,7 +1,6 @@
 from tkinter import *
 from phones import *
 
-
 class CreateWindow:
     def __init__(self):
         self.db = Database()
@@ -44,22 +43,26 @@ class CreateWindow:
         frame1 = Frame(win)
         frame1.pack()
 
+        # Text box for First Name
         Label(frame1, text="First Name").grid(row=0, column=0, sticky=W)
         fnamevar = StringVar()
         fname = Entry(frame1, textvariable=fnamevar)
         fname.grid(row=0, column=1, sticky=W)
 
+        # Text box for Last Name
         Label(frame1, text="Last Name").grid(row=1, column=0, sticky=W)
         lnamevar = StringVar()
         lname = Entry(frame1, textvariable=lnamevar)
         lname.grid(row=1, column=1, sticky=W)
 
+        # Text box for Phone number
         Label(frame1, text="Phone").grid(row=2, column=0, sticky=W)
         phonevar = StringVar()
         phone = Entry(frame1, textvariable=phonevar)
         phone.grid(row=2, column=1, sticky=W)
 
-        frame2 = Frame(win)  # Row of buttons
+        # Section for action buttons
+        frame2 = Frame(win)
         frame2.pack()
         b1 = Button(frame2, text=" Add  ", command=self.add_entry)
         b2 = Button(frame2, text="Update", command=self.update_entry)
@@ -70,7 +73,8 @@ class CreateWindow:
         b3.pack(side=LEFT)
         b4.pack(side=LEFT)
 
-        frame3 = Frame(win)  # select of names
+        # Section for list of contacts
+        frame3 = Frame(win)
         frame3.pack()
         scroll = Scrollbar(frame3, orient=VERTICAL)
         select = Listbox(frame3, yscrollcommand=scroll.set, height=6)

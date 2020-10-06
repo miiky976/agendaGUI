@@ -32,19 +32,11 @@ class Database:
 
     def insert(self, identity, fname, lname, phone):
         try:
-            self.phone_data = [(identity, fname, lname, phone)]
-            for i in self.phone_data:
-                sql_command = f"""
-                             INSERT INTO phonebook (id,
-                                                    fname,
-                                                    lname,
-                                                    number)
-                             VALUES ("{identity}",
-                                     "{fname}",
-                                     "{lname}",
-                                     "{phone}");
-                             """
-                self.cursor.execute(sql_command)
+            sql_command = f"""
+                           INSERT INTO phonebook (id, fname, lname, number)
+                           VALUES ("{identity}", "{fname}", "{lname}", "{phone}");
+                           """
+            self.cursor.execute(sql_command)
             self.connection.commit()
         except Exception as err:
             self.connection.rollback()
@@ -56,7 +48,7 @@ class Database:
         if result:
             try:
                 sql_command = """UPDATE phonebook SET fname = ?, lname = ?, number = ?\
-                                WHERE id = ?"""
+                                 WHERE id = ?"""
                 self.cursor.execute(sql_command, (fname, lname, phone, identity))
                 self.connection.commit()
             except Exception as err:
