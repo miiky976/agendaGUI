@@ -4,8 +4,7 @@ import sqlite3
 class Database:
     def __init__(self):
         try:
-            self.phone_data = ""
-            self.connection = sqlite3.connect("phonebook.db")
+            self.connection = sqlite3.connect("agenda.db")
             self.cursor = self.connection.cursor()
             self.create_table()
         except Exception as e:
@@ -21,20 +20,21 @@ class Database:
 
     def create_table(self):
         sql_command = """
-        CREATE TABLE IF NOT EXISTS phonebook (
+        CREATE TABLE IF NOT EXISTS agenda (
         id int PRIMARY KEY,
-        fname VARCHAR(50),
-        lname VARCHAR(50),
-        number VARCHAR(20)
+        nombre VARCHAR(50),
+        producto VARCHAR(50),
+        numero VARCHAR(20),
+        precio int
         );
         """
         self.cursor.execute(sql_command)
 
-    def insert(self, identity, fname, lname, phone):
+    def insert(self, identity, nombre, producto, numero, precio):
         try:
             sql_command = f"""
-                           INSERT INTO phonebook (id, fname, lname, number)
-                           VALUES ("{identity}", "{fname}", "{lname}", "{phone}");
+                           INSERT INTO agenda (id, nombre, producto, numero, precio)
+                           VALUES ("{identity}", "{nombre}", "{producto}", "{numero}", "{precio}");
                            """
             self.cursor.execute(sql_command)
             self.connection.commit()
@@ -43,13 +43,12 @@ class Database:
             print("Could not add to database")
             print(err)
 
-    def update(self, identity, fname, lname, phone):
+    def update(self, identity, nombre, producto, numero, precio):
         result = self.get_id(identity)
         if result:
             try:
-                sql_command = """UPDATE phonebook SET fname = ?, lname = ?, number = ?\
-                                 WHERE id = ?"""
-                self.cursor.execute(sql_command, (fname, lname, phone, identity))
+                sql_command = """UPDATE agenda SET nombre = ?, producto = ?, numero = ?, precio = ? WHERE id = ?"""
+                self.cursor.execute(sql_command, (nombre, producto, numero, precio, identity))
                 self.connection.commit()
             except Exception as err:
                 self.connection.rollback()
@@ -58,7 +57,7 @@ class Database:
 
     def delete(self, identity):
         try:
-            sql_command = """DELETE FROM phonebook WHERE id = ?"""
+            sql_command = """DELETE FROM agenda WHERE id = ?"""
             self.cursor.execute(sql_command, (identity,))
             self.connection.commit()
         except Exception as err:
@@ -68,7 +67,7 @@ class Database:
 
     def get_all(self):
         try:
-            sql_command = 'SELECT * FROM phonebook'
+            sql_command = 'SELECT * FROM agenda'
             self.cursor.execute(sql_command)
             result = self.cursor.fetchall()
             return result
@@ -77,7 +76,7 @@ class Database:
 
     def get_id(self, value):
         try:
-            sql_command = f'SELECT * FROM phonebook WHERE id={value}'
+            sql_command = f'SELECT * FROM agenda WHERE id={value}'
             self.cursor.execute(sql_command)
             result = self.cursor.fetchall()
             return result[0]

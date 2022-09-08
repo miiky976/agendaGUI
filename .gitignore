@@ -1,3 +1,4 @@
 .idea
 __pycache__
-phonebook.db
+agenda.db
+old_*.py
